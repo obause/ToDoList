@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Einstellungen" android:id="@+id/settings"/>
+    <item
+        android:id="@+id/info"
+        android:title="Info" />
+    <item
+        android:id="@+id/english"
+        android:title="English" />
+    <item
+        android:id="@+id/german"
+        android:title="Deutsch" />
+
+</menu>

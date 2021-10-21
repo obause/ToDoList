@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -69,47 +70,52 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static void writeTask (DBHelper dbHelper, String name, String status, Integer priority) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("name", name);
+        values.put("status", status);
+        values.put("priority", priority);
+        //values.put("projectId", projectId);
+        db.insert("tasks", null, values);
+    }
+
+    protected void readTasks (DBHelper dbHelper) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM tasks", null);
+
+        int nameIndex = cursor.getColumnIndex("name");
+        while (cursor.moveToNext()) {
+            listItems.add(cursor.getString(nameIndex));
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         textView = findViewById(R.id.textView2);
+        listView = findViewById(R.id.listView);
 
-        SQLiteDatabase myDatabase = this.openOrCreateDatabase("Tasks", MODE_PRIVATE, null);
+        //myDatabase.execSQL("INSERT INTO tasks (name, status, priority) VALUES ('Aufgabe1', 'Backlog', 1)");
+        //myDatabase.execSQL("INSERT INTO tasks (name, status, priority) VALUES ('Aufgabe2', 'In Progress', 3)");
 
-        myDatabase.execSQL("CREATE TABLE IF NOT EXISTS tasks (name VARCHAR, status VARCHAR, priority INT(1))");
-        myDatabase.execSQL("INSERT INTO tasks (name, status, priority) VALUES ('Aufgabe1', 'Backlog', 1)");
-        myDatabase.execSQL("INSERT INTO tasks (name, status, priority) VALUES ('Aufgabe2', 'In Progress', 3)");
+        DBHelper dbHelper = new DBHelper(this);
+        //writeDatabase(dbHelper, textView);
+        readTasks(dbHelper);
 
-        Cursor c = myDatabase.rawQuery("SELECT * FROM tasks", null);
-
-        int nameIndex = c.getColumnIndex("name");
-        int statusIndex = c.getColumnIndex("status");
-        int prioIndex = c.getColumnIndex("priority");
-
-        c.moveToFirst();
-
-        while (c.moveToNext()) {
-            Log.i("name", c.getString(nameIndex));
-            Log.i("status", c.getString(statusIndex));
-        }
 
         sharedPreferences = this.getSharedPreferences("obause.example.multiactivities", Context.MODE_PRIVATE);
         String language = sharedPreferences.getString("language", "ERROR");
 
-        HashSet<String> set = (HashSet<String>) sharedPreferences.getStringSet("tasks", null);
+        /*HashSet<String> set = (HashSet<String>) sharedPreferences.getStringSet("tasks", null);
 
         if (set == null) {
             listItems.add("Beispieltask");
         } else {
             listItems = new ArrayList(set);
-        }
-
-        listView = findViewById(R.id.listView);
-
-        //tinyDB = new TinyDB(this);
-        //listItems = tinyDB.getListString("tasks");
+        }*/
 
         Log.i("listItems onCreate", listItems.toString());
 
